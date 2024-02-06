@@ -1,51 +1,27 @@
-import { useEffect, useState } from "react";
 import "./App.css";
+import Contact from "./components/Pages/Contact";
+import Home from "./components/Pages/Home";
+import Root from "./components/Pages/Root";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
 function App() {
-  const [data, setData] = useState([]);
+  const router = createBrowserRouter([
+    {
+      element: <Root />,
+      children: [
+        {
+          path: "/",
+          element: <Home />,
+        },
+        {
+          path: "contact",
+          element: <Contact />,
+        },
+      ],
+    },
+  ]);
 
-  const [error, setError] = useState();
-
-  useEffect(() => {
-    const abortCont = new AbortController();
-
-    async function fetchData() {
-      try {
-        const res = await fetch("https://jsonplaceholder.typicode.com/posts", {
-          signal: abortCont.signal,
-        });
-        const data = await res.json();
-        setData(data);
-        console.log(data);
-      } catch (error) {
-        console.log("Error fetching data...");
-        if (error.name === "AbortError") {
-          console.log("Abort Error... ====>>", error);
-        } else {
-          setError(error.message);
-        }
-      }
-    }
-
-    fetchData();
-
-    return () => abortCont.abort();
-  }, [error]);
-
-  return (
-    <main>
-      <h1>Posts</h1>
-      {error && <p>Error: {error}</p>}
-      <ul>
-        {data.map((p) => (
-          <li key={p.id}>
-            <h3>{p.title}</h3>
-            <p>{p.body}</p>
-          </li>
-        ))}
-      </ul>
-    </main>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;
